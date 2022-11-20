@@ -3,4 +3,4 @@ project(system_programing C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(system_programing ex1/hello_world.c)
+add_executable(system_programing ex1/Ex1.c)
