@@ -35,54 +35,59 @@ int main() {
     char InputText[10][20] = {};
     while(ErrorCounter<MAX_MENU_CHOICE_ERROR){
         printMenu();
+        fflush(stdin);
         scanf("%d",&MenuChoice);
         while((MenuChoice<0) | (MenuChoice>99)){
             printf("Please enter a number between 0 and 99:");
+            fflush(stdin);
             scanf("%d",&MenuChoice);
         }
-        if ((MenuChoice>=0) & (MenuChoice<=8)){
-            ErrorCounter = 0;
-            if (MenuChoice==0) {
+        switch (MenuChoice) {
+            case 0:
                 printf("You chose to end the program, bye!!!");
                 return 0;
-            } else if(MenuChoice==1) {
+            case 1:
                 NumberOfString = getSize(MIN_WORD_INSERTED, MAX_WORD_INSERTED);
                 insertStrings(InputText, NumberOfString);
                 Flag = 1;
                 break;
-            } else {
-                if (Flag == 1) {
-                    switch (MenuChoice){
-                        case 2:
-                            printWords(InputText, NumberOfString);
-                            break;
-                        case 3:
-                            sortStringsLexicographic(InputText, NumberOfString);
-                            break;
-                        case 4:
-                            sortStringsByLength(InputText, NumberOfString);
-                            break;
-                        case 5:
-                            sortStringsByAsciiSum(InputText, NumberOfString);
-                            break;
-                        case 6:
-                            sortStringsByAsciiAvg(InputText, NumberOfString);
-                            break;
-                        case 7:
-                            sortEachString(InputText, NumberOfString);
-                            break;
-                        case 8:
-                            sortAllAsOne(InputText, NumberOfString);
-                            break;
-                    }
-                } else if (Flag==0){
-                    printf("There are no words, cannot operate.");
+            case 2:
+                if (Flag == 1) { printWords(InputText, NumberOfString); }
+                else { printf("There are no words, cannot operate."); }
+                break;
+            case 3:
+                if (Flag == 1) { sortStringsLexicographic(InputText, NumberOfString); }
+                else { printf("There are no words, cannot operate."); }
+                break;
+            case 4:
+                if (Flag == 1) { sortStringsByLength(InputText, NumberOfString); }
+                else { printf("There are no words, cannot operate."); }
+                break;
+            case 5:
+                if (Flag == 1) { sortStringsByAsciiSum(InputText, NumberOfString); }
+                else { printf("There are no words, cannot operate."); }
+                break;
+            case 6:
+                if (Flag == 1) { sortStringsByAsciiAvg(InputText, NumberOfString); }
+                else { printf("There are no words, cannot operate."); }
+                break;
+            case 7:
+                if (Flag == 1) { sortEachString(InputText, NumberOfString); }
+                else { printf("There are no words, cannot operate."); }
+                break;
+            case 8:
+                if (Flag == 1) { sortAllAsOne(InputText, NumberOfString); }
+                else { printf("There are no words, cannot operate."); }
+                break;
+            default:
+                ErrorCounter++;
+                if(ErrorCounter<5) {
+                    printf("You made %d errors from 5, try again,", ErrorCounter);
                 }
-            }
-        } else {
-            printf("You made %d errors from 5, try again,",++ErrorCounter);
+                break;
         }
     }
+    printf("5 errors, bye bye.");
     return 0;
 }
 
@@ -106,21 +111,24 @@ int getSize(int Min, int Max){
     //allocat 200 chars?!
     printf("Enter new word count,\n"
            "Please enter a number between %d and %d:", Min, Max);
+    fflush(stdin);
     scanf("%d", &NumberOfString);
     while ((NumberOfString<Min) | (NumberOfString>Max)){
-        printf("Enter new word count,\n"
-               "Please enter a number between %d and %d:", Min, Max);
+        printf("Please enter a number between %d and %d:", Min, Max);
+        fflush(stdin);
         scanf("%d", &NumberOfString);
     }
     return NumberOfString;
 }
 
 void insertStrings(char InputText[][20] ,int NumberOfString){
-    int i;
+    int i;// vld = 0;
     for (i=0;i<NumberOfString;i++) {
         printf("Please enter word #%d:", i+1);
-        while (!checkString(InputText+i)){
+        //vld = checkString(InputText[i]);
+        while (!checkString(InputText[i])){
             printf("Wrong input, try again:");
+            //vld = checkString(InputText[i]);
         }
     }
 }
@@ -128,7 +136,8 @@ void insertStrings(char InputText[][20] ,int NumberOfString){
 int checkString(char String[]){
     int i=0, j=0;
     char InputString[200];
-    scanf("%s",InputString);
+    fflush(stdin);
+    scanf("%[^\n]s",InputString);
     //gets(InputString);
     do{
         if (((InputString[i]<'A') | (InputString[i]>'Z')) & ((InputString[i]<'a') | ((InputString[i]>'z')))){
@@ -136,7 +145,7 @@ int checkString(char String[]){
         } else if (i>=MAX_STRING_SIZE-1){
             return 0;
         } else i++;
-    } while (InputString[i]!=0);
+    } while (InputString[i]!='\0');
     while(i!=j){
         String[j] = InputString[j];
         j++;
@@ -210,28 +219,28 @@ void sortStringsByLength(char InputText[][20],int NumberOfString){
 void sortStringsByAsciiAvg(char InputText[][20],int NumberOfString){
     int i, j;
     char TempString[20];
-    for (i = 0; i < NumberOfString; ++i) {
-        for (j = i + 1; j < NumberOfString; ++j) {
-            if (asciiAvg(InputText[i]) > asciiAvg(InputText[j])) {
-                strcpy(TempString, InputText[i]);
-                strcpy(InputText[i], InputText[j]);
-                strcpy(InputText[j], TempString);
-            }
+    for (i = 1; i < NumberOfString; i++) {
+        strcpy(TempString ,InputText[i]);
+        j = i - 1;
+        while (j >= 0 && (asciiAvg(InputText[j]) > asciiAvg(TempString))) {
+            strcpy(InputText[j+1] ,InputText[j]);
+            j = j - 1;
         }
+        strcpy(InputText[j+1],TempString);
     }
 }
 
 void sortStringsByAsciiSum(char InputText[][20],int NumberOfString){
     int i, j;
     char TempString[20];
-    for (i = 0; i < NumberOfString; ++i) {
-        for (j = i + 1; j < NumberOfString; ++j) {
-            if (asciiSum(InputText[i]) > asciiSum(InputText[j])) {
-                strcpy(TempString, InputText[i]);
-                strcpy(InputText[i], InputText[j]);
-                strcpy(InputText[j], TempString);
-            }
+    for (i = 1; i < NumberOfString; i++) {
+        strcpy(TempString ,InputText[i]);
+        j = i - 1;
+        while (j >= 0 && (asciiSum(InputText[j]) > asciiSum(TempString))) {
+            strcpy(InputText[j+1] ,InputText[j]);
+            j = j - 1;
         }
+        strcpy(InputText[j+1],TempString);
     }
 }
 
