@@ -36,62 +36,51 @@ int main() {
     while(ErrorCounter<MAX_MENU_CHOICE_ERROR){
         printMenu();
         scanf("%d",&MenuChoice);
-        switch (MenuChoice) {
-            case 0:
+        while((MenuChoice<0) | (MenuChoice>99)){
+            printf("Please enter a number between 0 and 99:");
+            scanf("%d",&MenuChoice);
+        }
+        if ((MenuChoice>=0) & (MenuChoice<=8)){
+            ErrorCounter = 0;
+            if (MenuChoice==0) {
                 printf("You chose to end the program, bye!!!");
                 return 0;
-            case 1:
-                NumberOfString = getSize(MIN_WORD_INSERTED,MAX_WORD_INSERTED);
+            } else if(MenuChoice==1) {
+                NumberOfString = getSize(MIN_WORD_INSERTED, MAX_WORD_INSERTED);
                 insertStrings(InputText, NumberOfString);
                 Flag = 1;
                 break;
-            case 2:
-                if (Flag==1){
-                    printWords(InputText, NumberOfString);
-                    ErrorCounter=0;
+            } else {
+                if (Flag == 1) {
+                    switch (MenuChoice){
+                        case 2:
+                            printWords(InputText, NumberOfString);
+                            break;
+                        case 3:
+                            sortStringsLexicographic(InputText, NumberOfString);
+                            break;
+                        case 4:
+                            sortStringsByLength(InputText, NumberOfString);
+                            break;
+                        case 5:
+                            sortStringsByAsciiSum(InputText, NumberOfString);
+                            break;
+                        case 6:
+                            sortStringsByAsciiAvg(InputText, NumberOfString);
+                            break;
+                        case 7:
+                            sortEachString(InputText, NumberOfString);
+                            break;
+                        case 8:
+                            sortAllAsOne(InputText, NumberOfString);
+                            break;
+                    }
+                } else if (Flag==0){
+                    printf("There are no words, cannot operate.");
                 }
-                break;
-            case 3:
-                if (Flag==1){
-                    sortStringsLexicographic(InputText, NumberOfString);
-                    ErrorCounter=0;
-                }
-                break;
-            case 4:
-                if (Flag==1){
-                    sortStringsByLength(InputText, NumberOfString);
-                    ErrorCounter=0;
-                }
-                break;
-            case 5:
-                if (Flag==1){
-                    sortStringsByAsciiSum(InputText, NumberOfString);
-                    ErrorCounter=0;
-                }
-                break;
-            case 6:
-                if (Flag==1){
-                    sortStringsByAsciiAvg(InputText, NumberOfString);
-                    ErrorCounter=0;
-                }
-                break;
-            case 7:
-                if (Flag==1){
-                    sortEachString(InputText, NumberOfString);
-                    ErrorCounter=0;
-                }
-                break;
-            case 8:
-                if (Flag==1){
-                    sortAllAsOne(InputText, NumberOfString);
-                    ErrorCounter=0;
-                }
-                break;
-            default:
-                if ((MenuChoice >=9) & (MenuChoice <=99)){
-                    ErrorCounter ++;
-                }
-                break;
+            }
+        } else {
+            printf("You made %d errors from 5, try again,",++ErrorCounter);
         }
     }
     return 0;
@@ -118,7 +107,7 @@ int getSize(int Min, int Max){
     printf("Enter new word count,\n"
            "Please enter a number between %d and %d:", Min, Max);
     scanf("%d", &NumberOfString);
-    while ((NumberOfString<Min) & (NumberOfString>Max)){
+    while ((NumberOfString<Min) | (NumberOfString>Max)){
         printf("Enter new word count,\n"
                "Please enter a number between %d and %d:", Min, Max);
         scanf("%d", &NumberOfString);
@@ -127,7 +116,7 @@ int getSize(int Min, int Max){
 }
 
 void insertStrings(char InputText[][20] ,int NumberOfString){
-    int i=0, vld;
+    int i;
     for (i=0;i<NumberOfString;i++) {
         printf("Please enter word #%d:", i+1);
         while (!checkString(InputText+i)){
@@ -138,29 +127,21 @@ void insertStrings(char InputText[][20] ,int NumberOfString){
 
 int checkString(char String[]){
     int i=0, j=0;
-    char *PtrInputString = NULL;
-    PtrInputString = (char*)malloc(sizeof(char)*MAX_STRING_SIZE);
-    if (PtrInputString == NULL){
-        printf("cannot allocate memory");
-        return 0;
-    }
-    scanf("%s",PtrInputString);
-    //gets("%s",PtrInputString);
+    char InputString[200];
+    scanf("%s",InputString);
+    //gets(InputString);
     do{
-        if (((PtrInputString[i]<'A') | (PtrInputString[i]>'Z')) & ((PtrInputString[i]<'a') | ((PtrInputString[i]>'z')))){
-            free(PtrInputString);
+        if (((InputString[i]<'A') | (InputString[i]>'Z')) & ((InputString[i]<'a') | ((InputString[i]>'z')))){
             return 0;
         } else if (i>=MAX_STRING_SIZE-1){
-            free(PtrInputString);
             return 0;
         } else i++;
-    } while (PtrInputString[i]!=0);
+    } while (InputString[i]!=0);
     while(i!=j){
-        *(String+j) = *(PtrInputString+j);
+        String[j] = InputString[j];
         j++;
     }
-    *(String+j) = 0;
-    free(PtrInputString);
+    String[j] = 0;
     return 1;
 }
 
@@ -278,13 +259,15 @@ void sortString(char String[]){
 
 void sortAllAsOne(char InputText[][20],int NumberOfString){
     char AllAsOne[200] = {};
-    int i, inx=0;
+    char TempString[20] = {};
+        int i, j, Len;
     for (i=0;i<NumberOfString;i++){
         strcat(AllAsOne,InputText[i]);
     }
     sortString(AllAsOne);
     for (i=0;i<NumberOfString;i++){
-        strcpy(InputText[inx],AllAsOne);
-        inx = inx+(int)strlen(InputText[i]);
+        for (j=0;j<strlen(InputText[i]);j++) {
+            InputText[i][j] = AllAsOne[NumberOfString * i + j];
+        }
     }
 }
