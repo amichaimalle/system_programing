@@ -162,7 +162,7 @@ void printWords(char InputText[][20],int NumberOfString){
     for (i=0;i<NumberOfString;i++){
         AsciiSum = asciiSum(InputText[i]);
         AsciiAvg = asciiAvg(InputText[i]);
-        printf("%02d:(ascii sum  %d, ascii avg  %.2f)%s\n",i+1,AsciiSum,AsciiAvg,*(InputText+i));
+        printf("%02d:(ascii sum %*d, ascii avg %*.2f)%s\n",i+1,4,AsciiSum,6,AsciiAvg,*(InputText+i));
     }
 }
 
@@ -191,28 +191,28 @@ double asciiAvg(char String[]){
 void sortStringsLexicographic(char InputText[][20],int NumberOfString){
     int i, j;
     char TempString[20];
-    for (i = 0; i < NumberOfString; ++i) {
-        for (j = i + 1; j < NumberOfString; ++j) {
-            if (strcmp(InputText[i], InputText[j]) > 0) {
-                strcpy(TempString, InputText[i]);
-                strcpy(InputText[i], InputText[j]);
-                strcpy(InputText[j], TempString);
-            }
+    for (i = 1; i < NumberOfString; i++) {
+        strcpy(TempString ,InputText[i]);
+        j = i - 1;
+        while (j >= 0 && (strcmp(InputText[j],TempString)>0)) {
+            strcpy(InputText[j+1] ,InputText[j]);
+            j = j - 1;
         }
+        strcpy(InputText[j+1],TempString);
     }
 }
 
 void sortStringsByLength(char InputText[][20],int NumberOfString){
     int i, j;
     char TempString[20];
-    for (i = 0; i < NumberOfString; ++i) {
-        for (j = i + 1; j < NumberOfString; ++j) {
-            if (strlen(InputText[i]) > strlen(InputText[j])) {
-                strcpy(TempString, InputText[i]);
-                strcpy(InputText[i], InputText[j]);
-                strcpy(InputText[j], TempString);
-            }
+    for (i = 1; i < NumberOfString; i++) {
+        strcpy(TempString ,InputText[i]);
+        j = i - 1;
+        while (j >= 0 && (strlen(InputText[j]) > strlen(TempString))) {
+            strcpy(InputText[j+1] ,InputText[j]);
+            j = j - 1;
         }
+        strcpy(InputText[j+1],TempString);
     }
 }
 
@@ -251,32 +251,31 @@ void sortEachString(char InputText[][20],int NumberOfString){
     }
 }
 
-void sortString(char String[]){
+void sortString(char String[]) {
     int i, j;
     int StringLength = strlen(String);
     char TempChar;
-    for (i = 0; i < StringLength; ++i) {
-        for (j = i + 1; j < StringLength; ++j){
-            if (String[i] > String[j]) {
-                TempChar = String[i];
-                String[i] = String[j];
-                String[j] = TempChar;
-            }
+    for (i = 1; i < StringLength; i++) {
+        TempChar = String[i];
+        j = i - 1;
+        while (j >= 0 && (String[j] > TempChar)) {
+            String[j + 1] = String[j];
+            j = j - 1;
         }
+        String[j + 1] = TempChar;
     }
 }
 
 void sortAllAsOne(char InputText[][20],int NumberOfString){
-    char AllAsOne[200] = {};
-    char TempString[20] = {};
-        int i, j, Len;
+    char AllAsOne[200];
+        int i, j, inx=0;
     for (i=0;i<NumberOfString;i++){
         strcat(AllAsOne,InputText[i]);
     }
     sortString(AllAsOne);
     for (i=0;i<NumberOfString;i++){
         for (j=0;j<strlen(InputText[i]);j++) {
-            InputText[i][j] = AllAsOne[NumberOfString * i + j];
+            InputText[i][j] = AllAsOne[inx++];
         }
     }
 }
