@@ -2,8 +2,8 @@
 // Submite by:
 // Amichai malle - ID: 308476977
 // Eliav cohen   - ID:318191913
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define MAX_MENU_CHOICE_ERROR 5
@@ -18,6 +18,8 @@ int checkString(char[]);
 void printWords(char[][20],int);
 void insertStrings(char InputText[][20] ,int NumberOfString);
 int getSize(int Min, int Max);
+int getNum();
+int StringToInt(char String[]);
 int asciiSum(char[]);
 double asciiAvg(char[]);
 void sortStringsLexicographic(char[][20],int);
@@ -32,15 +34,13 @@ void sortAllAsOne(char[][20],int);
 int main() {
     int MenuChoice, ErrorCounter=0, Flag=0;
     int NumberOfString;
-    char InputText[10][20] = {};
+    char InputText[10][20];
     while(ErrorCounter<MAX_MENU_CHOICE_ERROR){
         printMenu();
-        fflush(stdin);
-        scanf("%d",&MenuChoice);
-        while((MenuChoice<0) | (MenuChoice>99)){
+        MenuChoice = getNum();
+        while((MenuChoice<0) || (MenuChoice>99)) {
             printf("Please enter a number between 0 and 99:");
-            fflush(stdin);
-            scanf("%d",&MenuChoice);
+            MenuChoice = getNum();
         }
         switch (MenuChoice) {
             case 0:
@@ -108,27 +108,66 @@ void printMenu(){
 
 int getSize(int Min, int Max){
     int NumberOfString = 0;
-    //allocat 200 chars?!
     printf("Enter new word count,\n"
            "Please enter a number between %d and %d:", Min, Max);
-    fflush(stdin);
-    scanf("%d", &NumberOfString);
+    NumberOfString = getNum();
     while ((NumberOfString<Min) | (NumberOfString>Max)){
         printf("Please enter a number between %d and %d:", Min, Max);
-        fflush(stdin);
-        scanf("%d", &NumberOfString);
+        NumberOfString = getNum();
     }
     return NumberOfString;
 }
 
+int StringToInt(char String[]){
+    int i, len;
+    int Num = 0, Power = 1;
+    len = (int)strlen(String);
+    for(i=0; i<len ;i++){
+        Num = Num + (int)(String[len-i-1]-'0')*Power;
+        Power = Power*10;
+    }
+    return Num;
+}
+
+void getString(char InputString[]){
+    fflush(stdin);
+    scanf("%[^\n]s",InputString);
+    //gets(InputString);
+}
+
+int getNum(){
+    char InputString[200];
+    char NumString[200];
+    int Num;
+    int i=0, j=0, flag=0;
+    getString(InputString);
+    if (InputString[0]==0) return 100;
+    while (InputString[i] != 0){
+        if ((InputString[i] == ' ') | (InputString[i] == '\t')){
+            if (flag==1){
+                flag=2;
+            }
+            i++;
+        } else {
+            if (flag==0) flag=1;
+            if (flag==2) return 100;
+            if ((InputString[i]<'0') || (InputString[i]>'9')) return 100;
+            NumString[j] = InputString[i];
+            i++;
+            j++;
+        }
+    }
+    NumString[j] = '\0';
+    Num = StringToInt(NumString);
+    return Num;
+}
+
 void insertStrings(char InputText[][20] ,int NumberOfString){
-    int i;// vld = 0;
+    int i;
     for (i=0;i<NumberOfString;i++) {
         printf("Please enter word #%d:", i+1);
-        //vld = checkString(InputText[i]);
         while (!checkString(InputText[i])){
             printf("Wrong input, try again:");
-            //vld = checkString(InputText[i]);
         }
     }
 }
@@ -136,11 +175,9 @@ void insertStrings(char InputText[][20] ,int NumberOfString){
 int checkString(char String[]){
     int i=0, j=0;
     char InputString[200];
-    fflush(stdin);
-    scanf("%[^\n]s",InputString);
-    //gets(InputString);
+    getString(InputString);
     do{
-        if (((InputString[i]<'A') | (InputString[i]>'Z')) & ((InputString[i]<'a') | ((InputString[i]>'z')))){
+        if (((InputString[i]<'A') || (InputString[i]>'Z')) & ((InputString[i]<'a') || ((InputString[i]>'z')))){
             return 0;
         } else if (i>=MAX_STRING_SIZE-1){
             return 0;
@@ -155,20 +192,20 @@ int checkString(char String[]){
 }
 
 void printWords(char InputText[][20],int NumberOfString){
-    int i=0, AsciiSum;
+    int i, AsciiSum;
     double AsciiAvg;
     printf("The words are:\n"
            "==============\n");
     for (i=0;i<NumberOfString;i++){
         AsciiSum = asciiSum(InputText[i]);
         AsciiAvg = asciiAvg(InputText[i]);
-        printf("%02d:(ascii sum %*d, ascii avg %*.2f)%s\n",i+1,4,AsciiSum,6,AsciiAvg,*(InputText+i));
+        printf("%02d:(ascii sum %*d, ascii avg %*.2f)%s\n",i+1,4,AsciiSum,6,AsciiAvg,InputText[i]);
     }
 }
 
 int asciiSum(char String[]){
     int Sum = 0, i=0;
-    while((*(String+i)) != 0){
+    while(String[i] != 0){
         Sum = Sum+(int)String[i];
         i++;
     }
@@ -178,8 +215,8 @@ int asciiSum(char String[]){
 double asciiAvg(char String[]){
     double Sum=0;
     int i=0;
-    while((*(String+i)) != 0){
-        Sum = Sum+(int)*(String+i);
+    while(String[i] != 0){
+        Sum = Sum+(int)String[i];
         i++;
     }
     if (i==0){
@@ -253,8 +290,9 @@ void sortEachString(char InputText[][20],int NumberOfString){
 
 void sortString(char String[]) {
     int i, j;
-    int StringLength = strlen(String);
+    int StringLength;
     char TempChar;
+    StringLength = (int)strlen(String);
     for (i = 1; i < StringLength; i++) {
         TempChar = String[i];
         j = i - 1;
@@ -267,7 +305,7 @@ void sortString(char String[]) {
 }
 
 void sortAllAsOne(char InputText[][20],int NumberOfString){
-    char AllAsOne[200];
+    char AllAsOne[200] = "";
         int i, j, inx=0;
     for (i=0;i<NumberOfString;i++){
         strcat(AllAsOne,InputText[i]);
